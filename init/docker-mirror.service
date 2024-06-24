@@ -1,0 +1,13 @@
+[Unit]
+Description=Docker Registry Mirror Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/local/bin/docker-registry-mirror -registry mirror.ccs.tencentyun.com
+
+[Install]
+WantedBy=multi-user.target

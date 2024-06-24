@@ -13,9 +13,3 @@ build:
 .PHONY: buildLinuxX86
 buildLinuxX86:
 	GOOS=linux GOARCH=amd64 $(GO_BUILD) -o $(BUILD_DIR)/$(BIN_NAME)_linux_x86/ ./...
-
-.PHONY: deploy
-deploy: buildLinuxX86
-	@echo "Deploying to tecent"
-	@scp $(BUILD_DIR)/$(BIN_NAME)_linux_x86/$(BIN_NAME) tecent:~/$(BIN_NAME)
-	@ssh tecent "sudo systemctl stop $(BIN_NAME).service && sudo mv ~/$(BIN_NAME) /usr/bin/$(BIN_NAME) && sudo systemctl start $(BIN_NAME).service"
