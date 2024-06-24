@@ -21,6 +21,7 @@ func main() {
 	help := flag.Bool("help", false, "Show help")
 	flag.Parse()
 	if *help {
+		fmt.Printf("Docker Registry Proxy %s\n", BuildVersion)
 		flag.PrintDefaults()
 		return
 	}
