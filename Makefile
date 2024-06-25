@@ -1,4 +1,4 @@
-BIN_NAME=docker-registry-mirror
+BIN_NAME=docker-registry-proxy
 BUILD_DIR=./build
 BUILD=$(shell git rev-parse --short HEAD)@$(shell date +%s)
 CURRENT_OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
