@@ -12,9 +12,10 @@ server {
 
     client_max_body_size 0;
     chunked_transfer_encoding on;
+    set $upstream "mirror.ccs.tencentyun.com";
 
     location / {
-        proxy_pass https://mirror.ccs.tencentyun.com;  
+        proxy_pass https://$upstream;
         proxy_set_header Host mirror.ccs.tencentyun.com;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
