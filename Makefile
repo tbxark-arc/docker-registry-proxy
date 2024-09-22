@@ -1,4 +1,3 @@
-BIN_NAME=docker-registry-proxy
 BUILD_DIR=./build
 BUILD=$(shell git rev-parse --short HEAD)@$(shell date +%s)
 CURRENT_OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
@@ -8,8 +7,13 @@ GO_BUILD=CGO_ENABLED=0 go build $(LD_FLAGS)
 
 .PHONY: build
 build:
-	$(GO_BUILD) -o ./build/$(BIN_NAME)_$(CURRENT_OS)_$(CURRENT_ARCH)/ ./...
+	$(GO_BUILD) -o $(BUILD_DIR)/ ./...
 
 .PHONY: buildLinuxX86
 buildLinuxX86:
-	GOOS=linux GOARCH=amd64 $(GO_BUILD) -o $(BUILD_DIR)/$(BIN_NAME)_linux_x86/ ./...
+	GOOS=linux GOARCH=amd64 $(GO_BUILD) -o $(BUILD_DIR)/ ./...
+
+
+.PHONY: buildImage
+buildImage:
+	docker buildx build --platform=linux/amd64,linux/arm64 -t ghcr.io/tbxark-arc/docker-registry-proxy:latest . --push --provenance=false

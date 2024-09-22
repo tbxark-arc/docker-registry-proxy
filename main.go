@@ -6,16 +6,21 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
 var (
-	registryHost = "registry-1.docker.io"
-	serveAddress = "localhost:8989"
 	BuildVersion = "dev"
 )
 
 func main() {
+
+	registryHost := os.Getenv("REGISTRY_HOST")
+	if registryHost == "" {
+		registryHost = "registry-1.docker.io"
+	}
+	serveAddress := "localhost:8989"
 	flag.StringVar(&registryHost, "registry", registryHost, "Docker Registry Host")
 	flag.StringVar(&serveAddress, "address", serveAddress, "Serve Address")
 	help := flag.Bool("help", false, "Show help")
@@ -25,15 +30,27 @@ func main() {
 		flag.PrintDefaults()
 		return
 	}
-	http.HandleFunc("/", handler)
+
+	proxy := NewRegistryProxy(registryHost)
+	http.HandleFunc("/", proxy.handler)
 	log.Fatal(http.ListenAndServe(serveAddress, nil))
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+type RegistryProxy struct {
+	host string
+}
+
+func NewRegistryProxy(host string) *RegistryProxy {
+	return &RegistryProxy{
+		host: host,
+	}
+}
+
+func (p *RegistryProxy) handler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	originalHost := r.Host
 	if strings.HasPrefix(path, "/v2/") {
-		registryURL := fmt.Sprintf("https://%s%s", registryHost, path)
+		registryURL := fmt.Sprintf("https://%s%s", p.host, path)
 		req, err := http.NewRequest(r.Method, registryURL, r.Body)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -44,7 +61,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				req.Header.Add(name, value)
 			}
 		}
-		req.Header.Set("Host", registryHost)
+		req.Header.Set("Host", p.host)
 
 		client := http.DefaultClient
 		resp, err := client.Do(req)
