@@ -33,6 +33,7 @@ func main() {
 
 	proxy := NewRegistryProxy(registryHost)
 	http.HandleFunc("/", proxy.handler)
+	log.Printf("server start: %s", serveAddress)
 	log.Fatal(http.ListenAndServe(serveAddress, nil))
 }
 
@@ -49,6 +50,7 @@ func NewRegistryProxy(host string) *RegistryProxy {
 func (p *RegistryProxy) handler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	originalHost := r.Host
+	log.Printf("[%s] %s", r.Method, path)
 	if strings.HasPrefix(path, "/v2/") {
 		registryURL := fmt.Sprintf("https://%s%s", p.host, path)
 		req, err := http.NewRequest(r.Method, registryURL, r.Body)

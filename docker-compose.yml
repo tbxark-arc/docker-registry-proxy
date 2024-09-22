@@ -1,0 +1,11 @@
+services:
+  app:
+#    image: registry.tbxark.cn/docker-registry-proxy:latest
+    build: .
+    network_mode: bridge
+    container_name: docker-registry-proxy
+    pull_policy: always
+    ports:
+      - "8989:8989"
+    restart: always
+    command: ["--address", "0.0.0.0:8989", "--registry", "mirror.ccs.tencentyun.com"]
