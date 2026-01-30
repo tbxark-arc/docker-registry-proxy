@@ -1,3 +1,3 @@
-module github.com/TBXark/docker-registry-proxy
+module github.com/tbxark-arc/docker-registry-proxy
 
 go 1.22
